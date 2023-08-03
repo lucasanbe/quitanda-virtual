@@ -96,6 +96,7 @@ class _CartTabState extends State<CartTab> {
                     onPressed: () async {
                       bool? result = await showOrderConfirmation();
                       if (result ?? false) {
+                        // ignore: use_build_context_synchronously
                         showDialog(
                             context: context,
                             builder: (_) {

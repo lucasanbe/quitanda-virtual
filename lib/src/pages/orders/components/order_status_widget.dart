@@ -16,6 +16,7 @@ class OrderStatusWidget extends StatelessWidget {
   int get currentStatus => allStatus[status]!;
 
   OrderStatusWidget({
+    super.key,
     required this.isOverdue,
     required this.status,
   });
