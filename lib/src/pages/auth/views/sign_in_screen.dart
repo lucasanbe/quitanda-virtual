@@ -5,8 +5,7 @@ import 'package:greengrocer/src/pages/common_widgets/app_name_widget.dart';
 import 'package:greengrocer/src/pages/common_widgets/custom_text_field.dart';
 import 'package:greengrocer/src/config/custom_colors.dart';
 import 'package:greengrocer/src/pages_routes/app_pages.dart';
-
-import 'controller/auth_controller.dart';
+import '../controller/auth_controller.dart';
 
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
@@ -128,6 +127,7 @@ class SignInScreen extends StatelessWidget {
                                         authController.signIn(
                                             email: email, password: password);
                                       } else {
+                                        // ignore: avoid_print
                                         print('Campos não válidos!');
                                       }
                                       Get.offNamed(PagesRoutes.baseRoute);
