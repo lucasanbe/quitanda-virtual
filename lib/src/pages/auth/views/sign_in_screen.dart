@@ -5,6 +5,7 @@ import 'package:greengrocer/src/pages/common_widgets/app_name_widget.dart';
 import 'package:greengrocer/src/pages/common_widgets/custom_text_field.dart';
 import 'package:greengrocer/src/config/custom_colors.dart';
 import 'package:greengrocer/src/pages_routes/app_pages.dart';
+import '../../../services/validators.dart';
 import '../controller/auth_controller.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -77,15 +78,7 @@ class SignInScreen extends StatelessWidget {
                         controller: emailController,
                         icon: Icons.email,
                         label: 'Email',
-                        validator: (email) {
-                          if (email == null || email.isEmpty) {
-                            return 'Digite seu email!';
-                          }
-
-                          if (!email.isEmail) return 'Digite um email válido!';
-
-                          return null;
-                        },
+                        validator: emailValidator,
                       ),
                       //Senha
                       CustomTextField(
@@ -93,15 +86,7 @@ class SignInScreen extends StatelessWidget {
                         isSecret: true,
                         icon: Icons.lock,
                         label: 'Senha',
-                        validator: (password) {
-                          if (password == null || password.isEmpty) {
-                            return 'Digite sua senha!';
-                          }
-                          if (password.length < 7) {
-                            return 'Digite uma senha com pelo menos 7 caracteres';
-                          }
-                          return null;
-                        },
+                        validator: passwordValidator,
                       ),
                       //Botão de entrar
                       SizedBox(
@@ -126,10 +111,7 @@ class SignInScreen extends StatelessWidget {
                                             passwordController.text;
                                         authController.signIn(
                                             email: email, password: password);
-                                      } else {
-                                        print('Campos não válidos!');
                                       }
-                                      // Get.offNamed(PagesRoutes.baseRoute);
                                     },
                               child: authController.isLoading.value
                                   ? const CircularProgressIndicator()
