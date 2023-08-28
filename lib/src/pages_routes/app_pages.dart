@@ -3,6 +3,7 @@ import 'package:greengrocer/src/pages/base/base_screen.dart';
 import 'package:greengrocer/src/pages/splash/splash_screen.dart';
 import '../pages/auth/views/sign_in_screen.dart';
 import '../pages/auth/views/sign_up_screen.dart';
+import '../pages/base/binding/navigation_binding.dart';
 import '../pages/home/binding/home_binding.dart';
 
 abstract class AppPages {
@@ -23,6 +24,7 @@ abstract class AppPages {
       name: PagesRoutes.baseRoute,
       bindings: [
         HomeBinding(),
+        NavigationBinding(),
       ],
       page: () => const BaseScreen(),
     ),
