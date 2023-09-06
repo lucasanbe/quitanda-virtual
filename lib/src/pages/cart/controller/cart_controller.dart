@@ -1,10 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:greengrocer/src/models/cart_item_model.dart';
 import 'package:greengrocer/src/models/item_model.dart';
+import 'package:greengrocer/src/models/order_model.dart';
 import 'package:greengrocer/src/pages/auth/controller/auth_controller.dart';
 import 'package:greengrocer/src/pages/cart/cart_result/cart_result.dart';
 import 'package:greengrocer/src/pages/cart/repository/cart_repository.dart';
 import 'package:greengrocer/src/services/utils_services.dart';
+
+import '../../common_widgets/payment_dialog.dart';
 
 class CartController extends GetxController {
   final cartRepository = CartRepository();
@@ -12,6 +16,8 @@ class CartController extends GetxController {
   final utilsServices = UtilsServices();
 
   List<CartItemModel> cartItems = [];
+
+  bool isCheckoutLoading = false;
 
   @override
   void onInit() {
@@ -27,6 +33,40 @@ class CartController extends GetxController {
     return total;
   }
 
+  void setCheckoutLoading(bool value) {
+    isCheckoutLoading = value;
+    update();
+  }
+
+  Future checkoutCart() async {
+    setCheckoutLoading(true);
+
+    CartResult<OrderModel> result = await cartRepository.checkoutCart(
+      token: authController.user.token!,
+      total: cartTotalPrice(),
+    );
+
+    setCheckoutLoading(false);
+    result.when(
+      success: (order) {
+        cartItems.clear();
+        update();
+        showDialog(
+            context: Get.context!,
+            builder: (_) {
+              return PaymentDialog(
+                order: order,
+              );
+            });
+      },
+      error: (message) {
+        utilsServices.showToast(
+          message: message,
+        );
+      },
+    );
+  }
+
   Future<bool> changeItemQuantity({
     required CartItemModel item,
     required int quantity,
@@ -36,6 +76,22 @@ class CartController extends GetxController {
       cartItemId: item.id,
       quantity: quantity,
     );
+    if (result) {
+      if (quantity == 0) {
+        cartItems.removeWhere(
+          (cartItem) => cartItem.id == item.id,
+        );
+      } else {
+        cartItems.firstWhere((cartItem) => cartItem.id == item.id).quantity =
+            quantity;
+      }
+      update();
+    } else {
+      utilsServices.showToast(
+        message: 'Ocorreu um erro ao alterar a quantidade do produto',
+        isError: true,
+      );
+    }
     return result;
   }
 
@@ -70,17 +126,10 @@ class CartController extends GetxController {
     if (itemIndex >= 0) {
       //Já existe no carrinho
       final product = cartItems[itemIndex];
-      final result = await changeItemQuantity(
+      await changeItemQuantity(
         item: product,
         quantity: (product.quantity + quantity),
       );
-      if (result) {
-        cartItems[itemIndex].quantity += quantity;
-      } else {
-        utilsServices.showToast(
-          message: 'Ocorreu um erro ao alterar a quantidade do produto',
-        );
-      }
     } else {
       //Não existe no carrinho
       final CartResult<String> result = await cartRepository.addItemToCart(
